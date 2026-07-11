@@ -22,6 +22,4 @@ module "aft" {
 
   terraform_version      = "1.15.8"
   terraform_distribution = "oss"
-
-  aft_enable_vpc = false
 }
