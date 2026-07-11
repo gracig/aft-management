@@ -44,7 +44,7 @@ show-vending:
       | jq '.executions[] | {name: .name, status: .status, start: .startDate}'
 
 # Show SQS account request queue depth
-show-queue:
+show-account-request-queue:
     #!/usr/bin/env bash
     URL=$(aws sqs get-queue-url --queue-name aft-account-request.fifo \
       --profile {{AFT_PROFILE}} --query 'QueueUrl' --output text)
