@@ -87,14 +87,15 @@ fix-requeue-stuck:
     done
     echo "Done. Push to aft-account-requests to retrigger vending."
 
-# Show latest CodeBuild errors for account request pipeline
-show-logs:
-    #!/usr/bin/env bash
-    STREAM=$(aws logs describe-log-streams \
-      --log-group-name /aws/codebuild/ct-aft-account-request \
-      --order-by LastEventTime --descending \
-      --query 'logStreams[0].logStreamName' --output text --profile {{AFT_PROFILE}})
-    aws logs get-log-events \
-      --log-group-name /aws/codebuild/ct-aft-account-request \
-      --log-stream-name "$STREAM" --profile {{AFT_PROFILE}} \
-      | jq '.events[].message' -r | grep -i "error\|failed\|exit"
+# Show logs for any log group (last 30 min)
+show-logs group:
+    aws logs tail {{group}} --since 30m --profile {{AFT_PROFILE}}
+
+# Show logs for the Lambda that processes SQS and triggers Step Functions
+show-logs-request-processor:
+    just show-logs /aws/lambda/aft-account-request-processor
+
+# Show logs for the account request CodeBuild pipeline
+show-logs-request-pipeline:
+    just show-logs /aws/codebuild/ct-aft-account-request
+
