@@ -8,14 +8,13 @@ terraform {
     }
   }
 
-  # Uncomment after bootstrapping the S3 backend (cicdlab-aws-platform/bootstrap/)
-  # backend "s3" {
-  #   bucket         = "cicdlab-tfstate-141971524659"
-  #   key            = "aft-management/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   dynamodb_table = "cicdlab-tfstate-lock"
-  #   encrypt        = true
-  # }
+  backend "s3" {
+    bucket         = "cicdlab-tfstate-141971524659"
+    key            = "aft-management/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "cicdlab-tfstate-lock"
+    encrypt        = true
+  }
 }
 
 provider "aws" {
