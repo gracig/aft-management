@@ -12,7 +12,7 @@ terraform {
     bucket         = "cicdlab-tfstate-141971524659"
     key            = "aft-management/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "cicdlab-tfstate-lock"
+    use_lockfile   = true
     encrypt        = true
   }
 }
