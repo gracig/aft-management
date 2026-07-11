@@ -61,6 +61,24 @@ show-pipelines:
         | jq '.stageStates[] | {stage: .stageName, status: .latestExecution.status}'
     done
 
+# Delete stuck account requests (status=null) so the next pipeline run re-inserts and requeues them
+fix-requeue-stuck:
+    #!/usr/bin/env bash
+    STUCK=$(aws dynamodb scan --table-name aft-request --profile {{AFT_PROFILE}} \
+      --filter-expression "attribute_not_exists(#s)" \
+      --expression-attribute-names '{"#s":"status"}' \
+      --query 'Items[*].id.S' --output text)
+    if [ -z "$STUCK" ]; then
+      echo "No stuck requests found."
+      exit 0
+    fi
+    for ID in $STUCK; do
+      echo "Deleting stuck request: $ID"
+      aws dynamodb delete-item --table-name aft-request --profile {{AFT_PROFILE}} \
+        --key "{\"id\":{\"S\":\"$ID\"}}"
+    done
+    echo "Done. Push to aft-account-requests to retrigger vending."
+
 # Show latest CodeBuild errors for account request pipeline
 show-logs:
     #!/usr/bin/env bash
