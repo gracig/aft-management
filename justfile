@@ -44,7 +44,7 @@ show-vending:
       | jq -r '.executions[].executionArn' \
       | while read EXEC_ARN; do
           aws stepfunctions describe-execution --execution-arn "$EXEC_ARN" --profile {{AFT_PROFILE}} \
-            | jq '{account: (.input | fromjson | .account_request.control_tower_parameters.AccountName // "unknown"), status: .status, start: .startDate}'
+            | jq '{account: (.input | fromjson | .account_info.account.name // "unknown"), status: .status, start: .startDate}'
         done
 
 # Show SQS account request queue depth
