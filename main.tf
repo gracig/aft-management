@@ -15,8 +15,10 @@ module "aft" {
   account_request_repo_branch            = "main"
   account_customizations_repo_name       = "gracig/aft-account-customizations"
   account_customizations_repo_branch     = "main"
-  global_customizations_repo_name        = "gracig/aft-global-customizations"
-  global_customizations_repo_branch      = "main"
+  global_customizations_repo_name                        = "gracig/aft-global-customizations"
+  global_customizations_repo_branch                      = "main"
+  account_provisioning_customizations_repo_name          = "gracig/aft-account-provisioning-customizations"
+  account_provisioning_customizations_repo_branch        = "main"
   aft_framework_repo_url                 = "https://github.com/aws-ia/terraform-aws-control_tower_account_factory.git"
   aft_framework_repo_git_ref             = "1.20.1"
 
