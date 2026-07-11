@@ -35,18 +35,20 @@ show-requests:
     aws dynamodb scan --table-name aft-request --profile {{AFT_PROFILE}} \
       | jq '.Items[] | {account: .id.S, status: .status.S}'
 
-# Show Step Functions provisioning executions with account name
+# Show Step Functions provisioning executions — most recent per account
 show-vending:
     #!/usr/bin/env bash
     ARN=$(aws stepfunctions list-state-machines --profile {{AFT_PROFILE}} \
       --query 'stateMachines[?name==`aft-account-provisioning-framework`].stateMachineArn' \
       --output text)
     aws stepfunctions list-executions --state-machine-arn "$ARN" --profile {{AFT_PROFILE}} \
+      --max-results 100 \
       | jq -r '.executions[].executionArn' \
       | while read EXEC_ARN; do
           aws stepfunctions describe-execution --execution-arn "$EXEC_ARN" --profile {{AFT_PROFILE}} \
             | jq '{account: (.input | fromjson | .account_info.account.name // "unknown"), status: .status, start: .startDate}'
-        done
+        done \
+      | jq -s 'group_by(.account) | map(sort_by(.start) | last)'
 
 # Show SQS account request queue depth
 show-account-request-queue:
