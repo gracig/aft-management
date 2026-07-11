@@ -20,7 +20,7 @@ module "aft" {
   aft_framework_repo_url                 = "https://github.com/aws-ia/terraform-aws-control_tower_account_factory.git"
   aft_framework_repo_git_ref             = "1.20.1"
 
-  terraform_version      = "1.15.8"
+  terraform_version      = "1.9.8"
   terraform_distribution = "oss"
 
   aft_enable_vpc = false
