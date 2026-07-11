@@ -5,7 +5,7 @@ module "aft" {
   ct_management_account_id    = var.ct_management_account_id
   log_archive_account_id      = var.log_archive_account_id
   audit_account_id            = var.audit_account_id
-  aft_management_account_id   = var.ct_management_account_id
+  aft_management_account_id   = "172463318978"
 
   ct_home_region              = "us-east-1"
   tf_backend_secondary_region = "us-west-2"
