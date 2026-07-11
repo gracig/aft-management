@@ -61,6 +61,10 @@ show-pipelines:
         | jq '.stageStates[] | {stage: .stageName, status: .latestExecution.status}'
     done
 
+# Release a change on the account request pipeline to retrigger it
+fix-release-request-pipeline:
+    aws codepipeline start-pipeline-execution --name ct-aft-account-request --profile {{AFT_PROFILE}}
+
 # Delete stuck account requests (status=null) so the next pipeline run re-inserts and requeues them
 fix-requeue-stuck:
     #!/usr/bin/env bash
