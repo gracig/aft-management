@@ -1,4 +1,5 @@
 AFT_PROFILE := "aft"
+export AWS_PAGER := ""
 
 _assume:
     #!/usr/bin/env bash
