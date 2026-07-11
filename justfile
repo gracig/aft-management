@@ -29,13 +29,13 @@ apply:
     eval $(just _assume)
     terraform apply -auto-approve
 
-# Show all account requests in DynamoDB
-requests:
+# Show account requests queued in DynamoDB
+show-requests:
     aws dynamodb scan --table-name aft-request --profile {{AFT_PROFILE}} \
       | jq '.Items[] | {account: .id.S, status: .status.S}'
 
 # Show Step Functions provisioning executions
-executions:
+show-vending:
     #!/usr/bin/env bash
     ARN=$(aws stepfunctions list-state-machines --profile {{AFT_PROFILE}} \
       --query 'stateMachines[?name==`aft-account-provisioning-framework`].stateMachineArn' \
@@ -43,8 +43,8 @@ executions:
     aws stepfunctions list-executions --state-machine-arn "$ARN" --profile {{AFT_PROFILE}} \
       | jq '.executions[] | {name: .name, status: .status, start: .startDate}'
 
-# Show SQS queue depth
-queue:
+# Show SQS account request queue depth
+show-queue:
     #!/usr/bin/env bash
     URL=$(aws sqs get-queue-url --queue-name aft-account-request.fifo \
       --profile {{AFT_PROFILE}} --query 'QueueUrl' --output text)
@@ -52,13 +52,17 @@ queue:
       --attribute-names ApproximateNumberOfMessages ApproximateNumberOfMessagesNotVisible \
       --profile {{AFT_PROFILE}}
 
-# Show CodePipeline status for account request pipeline
-pipeline-status:
-    aws codepipeline get-pipeline-state --name ct-aft-account-request --profile {{AFT_PROFILE}} \
-      | jq '.stageStates[] | {stage: .stageName, status: .latestExecution.status}'
+# Show CodePipeline status for all AFT pipelines
+show-pipelines:
+    #!/usr/bin/env bash
+    for pipeline in ct-aft-account-request ct-aft-account-provisioning-customizations; do
+      echo "=== $pipeline ==="
+      aws codepipeline get-pipeline-state --name $pipeline --profile {{AFT_PROFILE}} \
+        | jq '.stageStates[] | {stage: .stageName, status: .latestExecution.status}'
+    done
 
-# Show latest CodeBuild log errors for account request
-logs:
+# Show latest CodeBuild errors for account request pipeline
+show-logs:
     #!/usr/bin/env bash
     STREAM=$(aws logs describe-log-streams \
       --log-group-name /aws/codebuild/ct-aft-account-request \
@@ -66,5 +70,5 @@ logs:
       --query 'logStreams[0].logStreamName' --output text --profile {{AFT_PROFILE}})
     aws logs get-log-events \
       --log-group-name /aws/codebuild/ct-aft-account-request \
-      --log-stream-name $STREAM --profile {{AFT_PROFILE}} \
+      --log-stream-name "$STREAM" --profile {{AFT_PROFILE}} \
       | jq '.events[].message' -r | grep -i "error\|failed\|exit"
