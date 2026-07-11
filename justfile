@@ -38,9 +38,9 @@ requests:
 executions:
     #!/usr/bin/env bash
     ARN=$(aws stepfunctions list-state-machines --profile {{AFT_PROFILE}} \
-      --query 'stateMachines[?contains(name,`provisioning`)].stateMachineArn' \
+      --query 'stateMachines[?name==`aft-account-provisioning-framework`].stateMachineArn' \
       --output text)
-    aws stepfunctions list-executions --state-machine-arn $ARN --profile {{AFT_PROFILE}} \
+    aws stepfunctions list-executions --state-machine-arn "$ARN" --profile {{AFT_PROFILE}} \
       | jq '.executions[] | {name: .name, status: .status, start: .startDate}'
 
 # Show SQS queue depth
